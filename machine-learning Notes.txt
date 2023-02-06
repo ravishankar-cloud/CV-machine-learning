@@ -1,0 +1,1375 @@
+	read the image/video and find a lane 
+
+read the image
+copy the image to new variable
+use COLOR_RGB2GRAY to change to grayscale
+use GaussianBlur to blur
+use canny to show darkened image
+create region of interest by defining boundary
+create a black image using zeroslike 
+use fillpoly to apply the defined boundary to blackimage and fill polygonal image with white(255)
+use And operator between above generated mask image and original image to generate region of interest image.
+Next we have to find the straight lines in the region of interest image.
+A straight line is represented by y=mx+b
+m and b are represented in hough transform
+b is intercept
+m is slope(14-8/4-2)
+but mx+b can cause inifinity problem
+instead of using cartesian coordinate system we can use polar coordinate system
+r=xcos* + ysin* 
+maximum number of intersection in a bin is the line drawn
+use HoughLinesP function to define this criteria
+use cv2.line to draw the line in a black image
+use cv2.addWeighted to blend the above line with original image
+now we have to optimise the lines by averaging the slope
+get the line as input
+use np.polyfit to find the slope and y intercept
+lines on the left will have negative slope and right will have positive slope
+list that contain all slopes and y intercept of left line and right line with "if slope < 0" left append else right append
+NOw we can average into single slope and y intercept using np.average 
+this np.average averages the slope which is used to optimise the line
+now we have to create the coordinates x1 y1 and x2 y2 for left and right lines from slope and intercept to provide the output
+find y1 and y2(check video again) and derive x1 and x2
+now instead of passing Hough detected line, we are going to pass the above average line calculated above
+use cv2.addWeighted to blend the above average line with original image
+
+now are going to apply this logic to a video
+capture the video using cv2.VideoCapture and put in a variable cap
+read the video frame by frame using cap.read()
+pass the video frame to the algorithm we created for detecting lanes 
+Waitkey has to be changed to 1 (1ms) else it cant differentiate between frames and cause infinite issue
+
+
+
+
+Neural networks
+
+in brain dendrites receive electrical signals and axon branches to send signals
+perceptron does this in machine learning
+multilayered perceptron forms neural network	
+two types: supervised and unsupervised learning
+supervised learning - we give labeled dataset as input to take its decisions
+Linear regressions: used by supervised learning--gets input from data already it has and predicts new data which is not labeled
+Classfication: Important concept in self driving
+need to implement an algorithm to find a line which classifies car, pedestrians, traffice signs
+model node has the linear function which processes the input whose result is passed to activation function to gerneate if it is + or -
+weight (w1 or w2) is important to produce the proper output
+Activation function can be represented as sigmoid (1/1+e-x)rather than a discrete value
+
+program:
+np.random.seed(0)
+to get the same random numbers all the time
+b=np.ones(n_pts)
+declare 1 as bias
+create top region
+
+we use random normal distribution to distribute points(based on bell curve) and give value as 10 horizontally (mean) which is considered as centre and standard deviation value as 2 or 3 representing deviation amount and how many points we need
+similarly declare the same random normal distribution vertically as mentioned above, give bias value as b
+we use array to arrange both horizontal and vertical point and bias and call it as top_region
+so use transpose to make horizontal and vertical point in same row
+use plt.subplots to plot multiple plots on same figure
+_,ax=plt.subplots(figsize=(4,4))
+
+unpack the tuple genereated in subplots 
+use the scatter function like ax.scatter(top_region[:,0],top_region[:,1],color='r')
+ to display the scattered data both horizontal and vertical points and give color as r(red)
+
+create bottom region
+
+just change the mean according to bottom region
+
+use the scatter function to display the scattered data both horizontal and vertical points and give color as r(blue)
+
+
+now we have output as plots for upper and bottom region with red and blue colors
+
+now we have to comeup with a line that separates these two discretely
+
+first create a line with random slope and intercept
+
+then calculates the error and then it adjusts with tiny steps automatically according to our training(gradient descent)
+
+sigmoid: e is error function -it assigns to each misclassfied points a big penalty and small penalties for correctly classified points
+
+move the line in the direction where the error penalty is high and keep moving till the error becomes low
+
+we need the probability and not discrete values, we can use sigmmoid (1/1+e-x) where x is the output of the linear line 
+
+more than 50 % is positive less than 50 % is probability of becoming negative
+
+use vstack on top and bottom region and declare as all_points, output will have x1 and x2 and bias
+
+declare w1 w2 and bias(random value)
+
+declare a variable line_parameters and insert w1,w2 and bias in np.matrix and transpose it because columns should be same as all_points
+
+the above 2 statements is not applicable because system itself have to generate a random w1 and w2 and bias and adjust it according to error function
+
+declare a variable as x1(x1 is horizontal value) and use array and in 1st column pick the left most point using bottom region min function and in second column ,pick the right most point using top region max function and name
+
+x2(vertical value) can be calculated as -b/w2+ x1*(-w1/w2)..It now has two vertical coordinates in an array.
+
+
+now plot the line using plt.plot and provide x1 and x2 
+
+the above 3 statements will come under gradient descent
+
+this line will have extreme left and extreme right horizontal axis(x1) and corresponding vertical axis(x2)
+
+declare a variable linear_combination and multiply all_points with line_parameters
+
+matrix multiplication adds w1x1, w2x2 and bias and give output in one column
+
+NOtice that negative points in the above column corresponds to points of red and positive points corrresponds to point of blue
+
+we need to change the output to a probablity for which we will use sigmoid
+
+declare a function named sigmoid and and define (1/1+e-x)
+
+declare a variable as probability and call the sigmoid function and give input as variable linear_combination-this can be removed and added under function calculate_error  
+
+now the probability has the output like 0.002,0.3,0.5,0.64
+
+numbers with below 0.5 are negative and above 0.5 are positive
+
+
+cross entropy- to determine which linear model better classifies the data
+
+the probability like 0.002,0.3,0.5,0.64 denotes the likeliness of being blue which is 1
+
+therefore probability of red is P(red)=1-P(blue)
+
+error is summation of natural logarithm of P(red)+P(blue)
+
+ln(p(red)+p(blue)) is called as cross entropy ..the lower the error the greater is our accuracy of showing correct line
+
+
+Good model will have low cross entropy..(we will choose \ model and not / model)
+
+given n_pts as 10
+
+set a variable y with np.array(np.zeros(n_pts)+np.ones(n_pts)).reshape(n_pts*2,1)--it has 10 '0's corresponding to top region in vstack(all-points) and 10 '1's corresponding to bottom region in vstack(all_points)  such that we have 20 rows and one column
+
+
+define a function calculate_error 
+
+declare a variable as m and all_points.shape[0] which gives the total number of rows.it can be used to divide the error by average
+
+p=sigmoid(points*line_paramters)
+
+cross entropy= -1/m(np.log(p).T * y + np.log(1-p).T*(1-y))
+
+Basically this finds the error rate of the line that is gernerated...if it is 0.8 then the line has more error and not classifying properly...minimal error rate denotes that line is classifying properly
+
+now we use gradient descent to minimize error and bring better linear line and reiterate to get best line 
+
+gradient is basically derivative respective to errors
+
+when we subtract errors from w1 w2 and b it gives new w1 w2 and b with less error derivative
+
+change w1 w2 and b to 0 so that let system decide it and correct itself
+
+the gradient of error function is n_pts(p-y)/m
+
+define a function gradient_descent 
+
+for i in range 500:
+m=points.shape[0]
+p=sigmoid(points*line_parameters)
+alpha=0.06(smallrer value of rectifying)
+
+gradient=alpha/m* (points.T *(p-y))
+
+subtracting the above gradient from line_parameters gives new w1 and w2 and provides new line_parameters which has smaller errors than the previous
+
+line_parameters=line_parameters-gradient
+
+w1=line_parameters.item(0)
+w2=line_parameters.item(1)
+b=line_parameters.item(2)
+x1=np.array([points[:,0].min(),points[:,0].max()])
+x2=-b/w2 + x1 * (-w1/w2)
+draw(x1,x2)
+
+call the function calculate_error that we defined for cross entropy which displays the error for each iteration and could see error rate decreasing
+the line rectifies itself and displays the final line with correct classification of blue and red
+
+
+Keras-To facilitate construction of neural network
+
+Keras can run on top of tensor flow,CNTK or theano
+
+we will use tensor flow
+
+Use keras to simplify the perceptron we constructed before
+
+from keras.models import Sequential
+
+from keras.layers import Dense--every layer is connected to preceding layer
+
+from keras.optimizers import Adam--Adaptive learning method algorithm..one of many optimizers..it is combination of 2 stochastic Gradient Descent algorithm Adagrad and RMSprop..adjusts w1 w2 and b on its own ..but Adam uses adaptive learning rate not a defined one especially for large data sets..
+
+declare a variable called model =Sequential() to define a instance of  Sequential
+
+now we can add layers to this model
+
+model.add(Dense(units=1,input_shape=2,),activation='sigmoid'))...units is 1 since we will have only one single output...input_shape is 2 since we have two inputs x1 and x2
+
+declare a variable adam and initialise an instance Adam(lr=0.1)
+
+we need to configure the learning process
+
+model.compile(adam,loss='binary_crossentropy',metrics=['accuracy'])..loss function is binary since we are expecting only two kind of outputs..metrics function is defined as accuracy
+
+we have to start the training model
+
+h=model.fit(x=X,y=y,verbose=1,batch_size=50,epochs=500,shuffle='true')...verbose =1 denotes progress at each epoch...the iteration of entire data set is called epoch, we need to divide by defining the batch_size to decrease the data sets batch_size=50...we have totally 1000 points..if batch size is 50..then 20 iterations to be completed to finish one epoch
+
+output
+
+for each epoch..we can see loss is decreasing and accuracy metrics is increasing
+
+
+we can plot above data as below and could see that after 10 epochs, accuracy remains the same and gets saturated
+plt.plot(h.history['accuracy'])
+
+
+we have successfully trained the neural network
+
+we have to PLOT our dataset along with precise boundary 
+
+now create a function plot_decision_boundary(X,y,model)
+X is our entire data y is the matrix containing sets of 0s and 1s and model is the sequential model we created earlier
+we have to define a grid that spans properly all our data like we did previously as figdata(4,4) earlier
+x_span=np.linspace((min(X[:,0]-1),max(X[:0+1])--equally spaces the coordinates from minimum horizontal value in our data to max horizontal value  ..-1 and +1 is tolerance to have more space in the plot
+y_span=np.linspace((min(X[:,1]-1,max(X[:1]+1))-equally spaces the coordinates from minimum vertical value in our data to max vertical value
+
+default we will have 50 spaces 
+
+use np.meshgrid to create 2D 50 x 50 matrix
+
+xx,yy=np.meshgrid(x_span,y_span)
+
+now xx has 50x50 matrix of x_span in row wise repeation and yy has 50x50 matrix of y_span in column wise repeation
+
+we have defined 50x50 grid spanning entire horizontal and vertical area
+
+the output of xx OR yy is 2d array
+
+use ravel to make it 1D
+
+  xx_,yy_=xx.ravel(),yy.ravel()
+
+if we concatenate xx_ and yy_ columnwise...,for every row there will be 50 columns..we have 50 rows which will have corresponding 50 columns
+
+
+
+grid=np.c_[xx_,yy_]
+
+
+now the trained model tests all our data inside 50x50 grid 
+
+ pred_func=model.predict(grid)
+
+the array prediction gives probability of 1...it does all work of sigmoid,cross entropy and gradient descent
+
+reshape this array to have same dimension of either xx or yy
+  z=pred_func.reshape(xx.shape)
+
+create contour plot to produce separated label wherew xx represents x coordinate and yy represents y coordinate and z array is the magnitude of probability of each corresponding coordinates 
+
+z is the probability of 0 to 1 and this is applied to xx and yy to produce contour plot and distinguishes 1 and 0 by color yellow and blue
+
+
+  plt.contourf(xx,yy,z)
+
+now let us give our own input 
+
+x=7.5
+y=5
+point=np.array([[x,y]])
+
+prediction=model.predict(point)
+
+plot this point as below to distinctly show
+plt.plot([x],[y],marker='o',markersize=10,color='red')
+
+print(
+    'PREDICTION IS',prediction
+)
+
+output is 0.9999916
+
+a very high probability of classifying as 1
+
+Deep Neural networks:
+
+HOw to form Non linear models: combine two linear perceptron model to 3rd model which can be non linear
+
+w1x1+ w2x2 + b where x1 is linear combination of 1st linear model and x2 is linear combination of 2nd linear model
+
+based upon weight of x1 and x2, the impact of their linear model impacts the output non linear model
+
+linearly combining existing models to create new model is the core of deep neural network
+
+Architecture of deep neural network:
+
+instead of calculating linear combination of x1(w1u1+w2u2+q) and x2(w1v1+w2v2+w) and bias and  then adding to non linear model..we can have single value x1 and x2 by multiplying weights of first and second linear model to a common x common y and common bias
+
+feedforward process
+
+no feedback loop..just directly pass one output as input to other neural network and obtain output
+
+backpropagation model
+
+   -- adjust the weight based upon the error which can be determined using cross entropy
+
+Deep Neural Network code:
+
+sklearn provides access to pre prepared data set that have more complex geometry
+
+from sklearn import datasets
+
+first define n_pts as 500
+
+declare X for datasets and y for labeling
+
+X,y=datasets.make_circles(n_samples=n_pts,random_state=123,noise=0.1,factor=0.2)
+
+random_state is not same as np.seed
+
+noise refers to standard deviation from a standard shape
+it should be around 0.1 and not more like 0.8
+
+factor 0.2 means 20%  size of smaller inner circle compared to the bigger outer circle
+
+X will have 2D coordinate of vertical and horizontal axis
+
+y will have labels of 0s and 1s
+
+
+
+largest circles are labeled as 0 and smaller circles are labeled as 1
+
+pick the horizontal axis and vertical axis of label 0
+
+plots the outer region
+
+plt.scatter(X[y==0,0],X[y==0,1])
+
+similarly pick the horizontal axis and vertical axis of label 1 
+
+plots the inner region
+
+plt.scatter(X[y==1,0],X[y==1,1])
+
+
+import keras related packages as below
+import keras
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.optimizers import Adam
+
+
+declare a variable called model =Sequential() to define a instance of  Sequential
+
+now we can add one extra layer(hidden layer) to this model unlike one layer in previous section
+
+model.add(Dense(4,input_shape=(2,),activation='sigmoid'))
+
+4 neurons(nodes) no specific number..but if we have 2 nodes..accuracy can be little low ..so giving 4
+input_shape=(2,)--number of nodes in input layer is 2
+
+model.add(Dense(1,activation='sigmoid'))
+
+1 node denotes one final layer of output
+
+input_shape not required since it is already defined in previous layer
+
+now we have to compile
+
+model.compile(Adam(learning_rate=0.01),'binary_crossentropy',metrics=['accuracy'])
+
+metrics we give accuracy which denotes accuracy--evaluates .it will not be backpropagated
+loss is binary_crossentropy-as we are classifying only 0s and 1s..it will be backpropagated
+
+h = model.fit(x=X,y=y,verbose=1,batch_size=20,epochs=100,shuffle='true')
+
+verbose =1 just displays the progress of our model at each epoch
+
+shuffle our training data before each epoch so it doesnt stuck at local minimum  but should be absolute minimum
+
+below code displays accuracy against eeach epoch
+
+plt.plot(h.history['accuracy'])
+plt.xlabel('epoch')
+plt.legend(['accuracy'])
+plt.title('accuracy')
+
+we can predict thr outcome of below points
+
+plt.scatter(X[:n_pts,0], X[:n_pts,1])
+plt.scatter(X[n_pts:,0], X[n_pts:,1])
+x=0.1
+y=0.5
+point=np.array([[x,y]])
+prediction=model.predict(point)
+plt.plot([x],[y],marker='o',markers
+
+Multiclassfication: classifying more than two type of data
+
+sigmoid not useful for multiclassification since it spans between 0 to 1 where 0 is one label and 1 is another label
+
+softmax can be used for multiclassification instead of sigmoid
+
+P(score m)=e^m/i=1,n e^i
+
+we cannot use label encoding which we used before which was 0 or 1 instead
+
+we use One hot encoding for multiclassification like soccer ball as 100 basket ball as 010 and volley ball as 001
+
+
+Multi classification Code:
+
+declare 3 coordinates
+centers=[[-1,1],[-1,-1],[1,-1]]
+
+use datasets.makeblobs to create n_pts of points and distributed with cluster_std=0.4 around their respective centers
+
+X,y=datasets.make_blobs(n_samples=n_pts,random_state=123,centers=centers,cluster_std=0.4)
+
+the output contains all data in X and all labels in y(labels are 0 1 2)
+
+plot all the points related to label 0 and label 1 and label 2 as below
+
+plt.scatter(X[y==0,0], X[y==0,1])
+plt.scatter(X[y==1,0], X[y==1,1])
+plt.scatter(X[y==2,0], X[y==2,1])
+
+this data has to undergo Hot encoding process because labeling 0 1 and 2 doesnot mean anything..it should be like 001 or 010 or 100
+
+from keras.utils.np_utils import to_categorical
+
+we take the labeled inputs which is 0 1 2 and outputs hot encoded data
+
+y_cat=to_categorical(y,3)
+
+where 3 is number of classification
+
+we will define a neural network to classify
+
+
+give activation function as softmax
+give looss functifon as  categorical_crossentropy
+model=Sequential()
+model.add(Dense(units=3,input_shape=(2,), activation='softmax'))
+model.compile(Adam(learning_rate=0.1),loss='categorical_crossentropy',metrics=['accuracy'])
+model.fit(x=X,y=y_cat,verbose=1,batch_size=50,epochs=100)
+
+plot_decision_boundary is same as that of previous except use model.predict_classes for predicting since we are using multi classes
+and change y to y_cat which has hot encoded data 
+
+
+Rest all same as that of previous
+
+
+plt.scatter(X[y==0,0], X[y==0,1])
+plt.scatter(X[y==1,0], X[y==1,1])
+plt.scatter(X[y==2,0], X[y==2,1])
+
+
+x=0.5
+y=-1
+point=np.array([[x,y]])
+prediction=model.predict(point)
+plt.plot([x],[y],marker='o',markersize=10,color='r')
+
+print("Prediction is",prediction)
+
+
+Output:  Prediction is 2(this corresponds to label 2 ..if we change x and y accordingly..prediction output changes as 1 or 0 according to it layer
+
+MNIST:
+
+there are 2 more sets along with training sets which are validation tests and test sets
+
+MNIST dataset is multiclass dataset ehichi consist of 10 classes 0 to 9 like 3 classes we classfied earlier
+
+An image is the input 28 X 28 pixels totally 784 pixels have to be analysed
+
+we need 784 nodes on the input layer, few hidden layers and 10 output nodes
+
+overfitting and underfiting
+
+Hyperparameters: To avoid overfitting, tune hyperparameters like learning rates, number of hidden layers by using validation sets
+
+A validation set is set of examples we use to finetune hyperparameters where we can  modify the complexity
+
+training set--standard parameters
+
+validation set---hyperparameters
+
+classifier has seen validation set..so info of validation set bleeds into training set
+
+so for final evaluation, we use test set..it has no effect on model
+
+MNIST implementation in code:
+
+import mnist from keras.datasets
+
+from keras.datasets import mnist
+
+imports 60000 mnist images in X_train along with labels and 10000 mnist images in X_test along with their associated labels
+
+(X_train,y_train),(X_test,y_test)=mnist.load_data
+
+
+28 X 28 means 28 pixels height and 28 pixels wide
+print(X_train.shape)
+print(X_test.shape)
+(60000, 28, 28)
+(10000, 28, 28)
+print(y_train.shape[0])
+60000 labels for our 60000 images
+
+below are the checks before proceeding the code, if the criteria doesnt match, the code stops executing
+
+assert(X_train.shape[0]==y_train.shape[0]), "The number of images is not equal to number of labels"
+assert(X_test.shape[0]==y_test.shape[0]), "The number of images is not equal to number of labels"
+assert(X_train.shape[1:]== (28,28)), "The dimensions of the image  are not 28X28"
+assert(X_test.shape[1:]== (28,28)), "The dimensions of the image  are not 28X28"
+
+
+num_of_samples=[]
+
+below plots 5 columns and 10 rows where each grid will have 5 inches of width and 10 inches of height
+
+
+cols=5
+num_classes=10
+fig,axs=plt.subplots(nrows=num_classes,ncols=cols,figsize=(5,10))
+
+below avoids overlapping of grid
+
+fig.tight_layout()
+
+below iterates every column(i) and in every column it iterates every row(j)
+
+
+for i in range(cols):
+  for j in range(num_classes):
+    
+    y_train has labels 0 to 9 for corresponding 60000 images in x_train
+    when we give y_train as j..it means that corresponding row when it matches y_train, pick only those images matching the label( it picks array image and 28 and 28)
+    x_selected=X_train[y_train==j]
+    
+    show the image(there will be several images for one label..we are using randint to pick random images) and colormap to grayscale
+    axs[j][i].imshow(x_selected[random.randint(0,len(x_selected-1)),:,:],cmap=plt.get_cmap("gray"))
+    
+    we are removing the numbers just to look good
+    axs[j][i].axis("off")
+   
+     just mention the label name whether it is 0 or 1 or 2 or... at the center(in our case 2)
+
+     although we display only few random images , we have to append the images to num_samples for every classification
+     X_selected already has that value for every classification. if we give length of X_selected then that number of images in each classification is appended 
+
+     if i==2:
+      axs[j][i].set_title(str(j))
+      num_of_samples.append(len(x_selected))
+
+print(num_of_samples)
+
+x_coordinate is 0-9 and y coordinate consists of number of samples in each classification
+
+plt.bar(range(0, num_classes), num_of_samples)
+
+
+
+
+
+now we hot encode labels as below
+
+y_train=to_categorical(y_train,10)
+y_test=to_categorical(y_test,10)
+
+
+we divide our training data by 255 for normalisation...because highest pixel will have 255 density..once we divide by 255 highest pixel density will be 1 which is normalised
+
+this helps neural network to accurately predict our data
+X_train=X_train/255
+X_test=X_test/255
+
+we are just flattening 28 X 28 in 1D array as below
+
+num_pixels=784
+X_train=X_train.reshape(X_train.shape[0],num_pixels)
+X_test=X_test.reshape(X_test.shape[0],num_pixels)
+
+print(X_train.shape)
+print(X_test.shape)
+
+output is (60000, 784)
+
+(10000, 784)
+
+we have now prepared the data set to train neural network
+
+Convolutional neural network is better than regular deep neural network
+
+first we will try with regular neural network and based upon the understanding of shortcomings,, we will move to convolutional neural networks
+
+introducing new activation function called relu which will be explained later .
+
+lets train the model
+
+def create_model():
+  model= Sequential()
+  model.add(Dense(10, input_dim= num_pixels,activation='relu'))
+  model.add(Dense(10,activation='relu'))
+  model.add(Dense(num_classes,activation='softmax'))
+  model.compile(Adam(lr=0.01),loss='categorical_crossentropy',metrics='accuracy')
+  return model
+
+model=create_model()
+print(model.summary())
+
+Output is as below
+
+Model: "sequential"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ dense (Dense)               (None, 10)                7850      
+                                                                 
+ dense_1 (Dense)             (None, 10)                110       
+                                                                 
+ dense_2 (Dense)             (None, 10)                110  
+
+
+first layer is parameterised by 7850 weights and bias which is a lot
+
+2D MNIST images 28X28..we made it to 1D as 784 by changing to grayscale
+
+what if we compute RGB images with 72X72 which corresponds to 5184 pixel intensity values and since it is 3 channel(3D image) multiply 5184 * 3 = 15552
+
+this is not feasible to train
+
+however we will continue to analyse with regular deep neural network
+
+train with below epoch, validation_split represents validation set(0.1 means 10% from training set)
+
+h = model.fit(X_train, y_train, validation_split=0.1, epochs = 10, batch_size = 200, verbose = 1, shuffle = 1)
+
+
+Below plots loss of training set with loss of validation set ..at around 10 epochs both have less loss which means it is trained well
+plt.plot(h.history['loss'])
+plt.plot(h.history['val_loss'])
+plt.legend(['loss', 'val_loss'])
+plt.title('Loss')
+plt.xlabel('epoch')
+
+
+model.evaluate evaluates our test set against our model
+
+score=model.evaluate(X_test,y_test,verbose=0)
+print("Test Score:",score[0])
+print("Test Accuracy:",score[1])
+
+output shows accuracy is 93.75% which is good(but convolutional neural network will have igh accuracy)
+Test Score: 0.21803738176822662
+Test Accuracy: 0.9375
+
+
+from Python Imaging library, import Image package and use this package to open the raw contents in the url and plot the image
+import requests
+from PIL import Image
+url="https://printables.space/files/uploads/download-and-print/large-printable-numbers/3-a4-1200x1697.jpg"
+response=requests.get(url,stream=True)
+img=Image.open(response.raw)
+plt.imshow(img)
+
+but this image which we webscraped should have same 28 X 28 grayscale image which we trained..so we have to modify using np.asarray which converts input image to arrays
+
+resize 28 X 28 like which we trained using CV2.resize
+
+the output is 28 X 28 X 4 where 4 is depth ( red green blue and alpha channels) but we trained only for grayscale for our training set
+
+which is just 2 D, 4 shoould not be accounted 
+
+convert to grayscale using cv2.cvtColor(resized,cv2.COLOR_BGR2GRAY)
+
+the output is 28 X 28..just 2D
+import cv2
+img_array=np.asarray(img)
+resized=cv2.resize(img_array,(28,28))
+gray_scale=cv2.cvtColor(resized,cv2.COLOR_BGR2GRAY)
+print(gray_scale.shape)
+image=cv2.bitwise_not(gray_scale)
+plt.imshow(image,cmap=plt.get_cmap("gray"))
+
+
+we normalise by dividing by 255
+
+image=image/255
+image=image.reshape(1,784)
+
+
+prediction=model.predict(image)
+p=np.argmax(prediction, axis=1)
+print("prediction is", p)
+
+1/1 [==============================] - 0s 174ms/step
+prediction is [2]
+
+we were accurate
+
+
+Convolutional neural network:
+
+Three layers:
+Convolutional layer
+Pool layer
+Fully Connected layer
+
+Convolutional layer:
+
+All the pixels in the image correspond to one node are fed to convolutional layer are going to be processed by convolutional filter(aka kernel matrix)
+
+slide the kernel at every location of image and the amount which we are shifting is called as stride
+
+
+for example,if the value of receptive field(box around the pixel image that we are computing) is 100..box aroun 100 will be multipled with kernel matrix
+
+0 -1 0
+-1 5 -1
+0 -1 0
+
+
+take the sum of all the values
+
+and divide by 9 ( number of fields in receptive filed)
+
+the result is shown in feature map
+
+the primary purpose of the convulutional layer is to extract the image features and hence the name feature map
+
+different filters(kernel matrix values) are able to detect different features from the image
+
+each kernel will have its own feature map
+
+combining the feature map provides the output of convolutional layer
+
+for 2 D images 3X3 kernel matrix is sufficient but for 3 D images where 3rd axis represents depth (containing Red Green and Blue) , kernel matrix should be 3 X 3 X 3
+
+
+if we consider 72 X 72 image of 3 D which needs 72 X 72 X 3=15K nodes which requires high computational power in case of deep neural network,
+
+when coming to convolutional neural network, we use 3 X 3 X 3 kernel matrix ...we will have only 27 weights each
+
+the output will be a 3 D feature map and then apply Relu activation
+
+
+Relu activation---feature map will have linear operation ..Relu is used to produce non linear values.
+
+Relu will perform empirically better as well as inspired from biology 
+
+Sigmoid and Tanh have common artificial intelligence problem called Vanishing gradient (decreased feedforward gradient wtihin neural network) 
+
+our deep neural network mainly depends upon gradient as backpropagation to reduce the error
+
+so Sigmoid and Tanh provides slow learning progress 
+
+so we are using Relu(rectified linear unit) where gradient value doesnot get decreased
+
+
+we can design the kernel matrix corresponding to features of the image itself..
+if we design 3 kernel matrix with 3 features we obtain 3 convolved images related to feature of interest that we gave in kernel matrix
+
+the output is sent to Relu activation to account real world non linearity..it converts all negative values to 0
+
+
+Pooling layer:
+
+
+there are many operations in pooling like sum average max
+
+max pooling:
+
+specify a kernel with 2 X 2 and convolve through the convoluted image such that it takes only max value of each grid with stride of 2.
+
+it just scale down itself without impacting our feature of interest that we gave in the input(reduces overfitting and computational power)
+
+due to disruptive nature of pooling layer,we keep window size small like 2 X 2
+
+this output can be fed to one more convolutional as well as pooled layer if we need to produce more fine tuned feature maps and relu is applied and pooled images
+
+Fully Connected layer
+
+
+it is in charge of classification.
+
+All the processed feature maps are fed to respective nodes(100 inputs will have 100 nodes)
+
+each node is connected to all nodes similar to multiclassifcation which we saw earlier unlike convolutional layer
+
+it updates its weight and bias value to minimise error based on gradient descent similar to what we saw eariler
+
+
+COnvolutional neural network Code:
+
+copy paste the MNIST code except we used to flatten from 28 X 28 image to 784 and we fed 784 inputs to 784 nodes
+
+but now we leave 28 X 28 as it is along wiht this, we  add depth of 1
+
+Adding depth of 1 is very important in convolutional neural network as we are dealing with just grayscale image
+
+
+LeNet was the first architectural model introduced for convolutional neural network
+
+
+from keras.layers import Flatten
+from keras.layers.convolutional import Conv2D
+from keras.layers.convolutional import MaxPooling2D
+
+
+our LeNet model contains 2 Conv layers and 2 pooling layers
+
+Define the Le_Net model function
+
+30 filter(kernel matrix) so 30 output
+
+padding is used for spatial dimensionality of image. As we might have seen stride doesnot cover all the borders, this can be used to process the borders
+
+since our mnist images are centered..we dont need to use it in our scenario but it is important
+
+
+stride is 1 as default and hence not adding that as well in below code
+
+def leNet_model():
+  model=Sequential()
+  
+  we get 780 parameters frm below as per 30X5X5 + 30(bias)=780 
+  model.add(Conv2D(30,[5,5],input_shape(28,28,1),activation="relu"))
+
+  grabs max value from each feature map with 2X2 neighborhood shrinking the image size to half
+  model.add(MaxPooling2D(pool_size=(2,2)))
+
+  applies 15 filters to the output of 30 images we already got..15X30X3X3=4050 + 15-=4065 where 15 is bias
+  4065 parameters is 5 times in depth accuracy as that of Conv1 layer
+
+  model.add(Conv2D(15,[3,3],activation="relu"))
+  model.add(MaxPooling2D(pool_size=(2,2)))
+
+  Now we have to flatten the image to 1D to feed this to Fully connected layer
+
+  model.add(Flatten())
+  
+500 is just arbitray number 
+model.add(Dense(500,activation="relu"))
+
+add one more fully connected layer for output..so since we have 10 classes for mnist we give num_classes which is 10 and activation function as softmax
+  model.add(Dense(num_classes,activation="softmax"))
+  model.compile(Adam(lr=0.01),loss="categorical_crossentropy",metrics=['accuracy'])
+
+print(model.summary())
+
+above prints the parameters and shape in each layer
+
+
+history=model.fit(X_train,y_train,epochs=10,validation_split=0.1,batch_size=400,verbose=1,shuffle=1)
+
+now the accuracy is 0.9934 which is very good
+
+now we apply this model to a random image 2 by importing from web and apply and see the output as 2
+
+note since convolutional neural network involves depth as well..we have to reshape like this as opposed to normal neural network ( we gave this in previous algorithmimage=image.reshape(1,784))--- but this is for current convolutional--	image=image.reshape(1,28,28,1)
+
+we need to further reduce overfitting
+
+dropdown function- it randomly selects few nodes and turn it off
+
+this is applied only in training and validation set not in test set
+
+when one of the random node is turned off and if the other node which is on is performing bad,it learns from the backpropagation and improves the efficiency
+
+from keras.layers import Dropout  
+model.add(Dropout(0.5))
+0 indicates no nodes are dropped, 1 indicates all nodes are dropped but have given 0.5 indicating 50 % drop of nodes which is recommended
+
+
+
+check the output accuracy is more
+
+now we will visualise the output of convolutional layer
+
+we need a package called Model api which allows to extract theoutput of each model and then visualise using matplotlib
+
+this takes 2 parameters input and output
+
+from keras.models import Model
+
+access the input and output of first layer by  providing index as 0..refer to model.summary
+
+layer1= Model(inputs=model.layers[0].input,output=model.layers[0].output)
+
+input is still the same even in the second layer and extract output from 3rd layer as index [2] 
+
+layer2= Model(inputs=model.layers[0].input,outputs=model.layers[2].output)
+
+both layer1 and layer2 shows what convolutional layer have processed
+
+we are now feeding the sample image '3' which is already in image variable
+
+visual_layer1,visual_layer2= layer1.predict(image),layer2.predict(image)
+print(visual_layer1)
+print(visual_layer2)
+
+output just contains the array 
+[1,24,24,30]
+[1,10,10,15]
+
+to display the first layer 30 filtered image:
+
+plt.figure(figsize=(10,6))
+for i in range (30):
+  plt.subplot(6,5,i+1)
+  plt.imshow(visual_layer1[0,:,:, i],cmap=plt.get_cmap('jet'))
+  plt.axis('off')
+
+30 is given to iterate 30 filters.
+subplot(6,5) is given to plot all 30 images in grid like pattern which has 6 rows and 5 columns
+plot the appropriate image with imshow
+now we see 30 images which represent 30 feature maps and it little bit recognisable
+
+to display the second layer 15 filtered image:
+
+plt.figure(figsize=(10,6))
+for i in range (15):
+  plt.subplot(3,5,i+1)
+  plt.imshow(visual_layer2[0,:,:, i],cmap=plt.get_cmap('jet'))
+  plt.axis('off')
+
+totally unrecognisable which means deeper understanding of the image by layer2
+
+
+Classifying traffic signs:
+
+while MNIST dataset contained 10 classes, traffic signs contain 43 classes
+
+
+we download traffic sign images and deserialise each train,test and validation set using pickle module as below
+
+! git clone https://bitbucket.org/jadslim/german-traffic-signs
+
+with----execute 2 operations and invoke a block of code in between like with automatically closes the file for us
+
+rb is reading file in binary format
+
+with open('german-traffic-signs/train.p','rb') as f:
+  train_data=pickle.load(f)
+
+with open('german-traffic-signs/valid.p','rb') as f:
+  val_data=pickle.load(f)
+
+with open('german-traffic-signs/test.p','rb') as f:
+  test_data=pickle.load(f)
+
+print(type(train_data))---it is a dictionary containing key value pair
+
+we pick features and labels	
+
+X_train,Y_train =train_data['features'],train_data['labels']
+X_val,Y_val=val_data['features'],val_data['labels']
+X_test,Y_test=test_data['features'],test_data['labels']
+
+print(X_test.shape)
+print(X_val.shape)
+print(X_train.shape)
+
+we have 34799 training images which have 32 X 32 pixel and 3 Dimensional and similarly for test abd valiadtion set
+(12630, 32, 32, 3)
+(4410, 32, 32, 3)
+(34799, 32, 32, 3)
+
+
+
+assert(X_train.shape[0]== Y_train.shape[0])," The number of images is not equal to number of labels"
+assert(X_val.shape[0]== Y_val.shape[0])," The number of images is not equal to number of labels"
+assert(X_test.shape[0]== Y_test.shape[0])," The number of images is not equal to number of labels"
+assert(X_train.shape[1:]==(32,32,3)), "The dimensions of the image are not 32 X 32 X 3"
+assert(X_val.shape[1:]==(32,32,3)), "The dimensions of the image are not 32 X 32 X 3"
+assert(X_test.shape[1:]==(32,32,3)), "The dimensions of the image are not 32 X 32 X 3"
+
+
+To manipulate data in csv files we need pandas which data analysis library
+
+it has become standard to use pandas when using csv files
+
+import pandas as pd
+
+
+data=pd.read_csv('german-traffic-signs/signnames.csv')
+
+now loop i and j as we did eariler and display the image via classes
+
+now we are going to preprocess the image since it is very complex compared to MNIST dataset
+
+
+Step 1) change the image to grayscale: important thing is color is not relevant to traffic sign 
+                                       next thing is if we reduce the depth from 3 to 1 so we will have fewer parameters and less computing power
+
+Step 2) Histogram Equalisation--Standardise the lighting in all of our images...yhe result will also have higher contrast in our image and it helps to extract the features
+
+	MNIST doesnot need this but for regular images in real world this is required
+
+img=cv2.equalizeHist(img)
+
+to be noted that the above function only takes grayscale images which doesnot have any depth
+
+
+The output has more contrasted image of grayscale
+
+step 3) we have to divide by 255 as we did earlier
+
+put the above steps of preprocessing in preprocessing function
+
+now we have to apply this to our entire dataset
+
+below code maps our function like it applies our function to the dataset
+
+X_train=np.array(list(map(preprocessing,X_train)))
+X_val=np.array(list(map(preprocessing,X_val)))
+X_test=np.array(list(map(preprocessing,X_test)))
+
+
+
+X_train=np.array(list(map(preprocessing,X_train)))
+X_val=np.array(list(map(preprocessing,X_val)))
+X_test=np.array(list(map(preprocessing,X_test)))
+
+we have to change the shape with depth 1 which is necessary before processing by convolutional layer
+
+X_train.reshape(34799, 32, 32,1)
+X_val.reshape(4410, 32, 32, 1)
+X_test.reshape(12630, 32, 32, 1)
+
+now we have to one hot encode
+
+Y_train=to_categorical(Y_train,43)
+Y_test=to_categorical(Y_test,43)
+Y_val=to_categorical(Y_val,43)
+
+now define lenet_model and test the model with our test data
+
+the prediction is not accurate and accuracy level is also little less since our dataset is complex
+
+Fine tuning model:
+
+it depends on the task
+
+we change Adam rate from 0.01 to 0.001
+
+now the accuracy increased
+
+increase the filter of layer1 from 30 to 60 and filter of layer2 from 15 to 30
+
+Accuracy is more better now
+
+Add one more drop out layer
+
+accuracy increased
+
+
+Now we will apply this algorithm to real time images
+
+take one image from web 
+import requests
+from PIL import Image
+url = 'https://c8.alamy.com/comp/J2MRAJ/german-road-sign-bicycles-crossing-J2MRAJ.jpg'
+r = requests.get(url, stream=True)
+img = Image.open(r.raw)
+plt.imshow(img, cmap=plt.get_cmap('gray'))
+
+
+preprocess the image using preprocessing function
+
+prediction=model.predict(img)
+p=np.argmax(prediction, axis=1)
+print("prediction is", p)
+
+prediction is [1]
+
+which is correctly classfied as 1
+
+but when we input other images, sometimes it guesses incorrectly
+
+
+One more technique to improve model:
+
+ Data augmentaion ---transform existing imges using more useful way
+
+look at variety of different perspective and extract relevant features
+
+below 5 transformation we are going to apply 
+
+from keras.preprocessing.image import ImageDataGenerator
+datagen=ImageDataGenerator(width_shift_range=0.1,
+                          height_shift_range=0.1,
+                          zoom_range=0.2,
+                          shear_range=0.1,
+                          rotation_range=10.)
+
+datagen.fit(X_train)
+
+below function flow executes and generates new images with batch size 20
+
+batches=datagen.flow(X_train,Y_train,batch_size=20)
+
+
+next' python funct'ion iterates and retrieves next batch ( in our case 20)
+
+X_batch, y_batch = next(batches)
+
+below line uses datagen function and fit our model
+
+history=model.fit(datagen.flow(X_train,Y_train,batch_size=50),steps_per_epoch = len(X_train)//100,epochs=20,validation_data=(X_val,Y_val),shuffle=1)
+
+
+Regression---
+
+Classification works on discrete values but linear regression works on continuous spectrum
+
+since y is dependent on X input_dim is 1
+
+model.add(Dense(50,activation='sigmoid',input_dim=1))
+
+
+Mean square error: how far the actual value is from estimated value
+
+
+Behavioural cloning:
+
+read the csv file using pandas
+
+columns=['center','left','right','steering','throttle','reverse','speed']
+data=pd.read_csv(os.path.join(datadir,'driving_log.csv'),names=columns)
+pd.set_option('display.max_colwidth',-1)
+data.head()---it shows first 5 rows
+
+
+import ntpath--just to tailor the path of the columns
+
+we need to visualise the data to check what flaws existing data has and accordingly preprocess the images
+
+use histogram function to check the frequency of each steering and then plot the bar of steering angle of each image against histogram output..we take sample 25 images
+
+num_bins=25
+hist,bins=np.histogram(data['steering'],num_bins)
+center=(bins[:-1] + bins[1:]) * 0.5--we are adding adjacent column data for centering around 0 else car wont drive straight and multiply by 0.5
+plt.bar(center,hist,width=0.05)
+
+the output has high frequency around 0 steering angle which can make bias and conclude to drive straight.
+
+what we do is reject all samples above threshold
+
+
+samples_per_bin=200---above 200 frequency it will reject
+
+
+it plots a line on the above bar chart with 200 as frequency of histogram
+
+plt.plot((np.min(data['steering']),np.max(data['steering'])),(samples_per_bin,samples_per_bin))
+
+now we have to prepare a list to remove unnecessary data that is above 200 for uniform data
+
+data.drop(data.index[remove_list],inplace=True)
+
+now we shall prepare training set and label
+
+label refers to steering angle
+
+
+ displays data like center left right steering throttle reverse speed for each row--   indexed_data=data.iloc[i]
+
+in order to split training data and validation data, we import below module from sklearn
+
+from sklearn.model_selection import train_test_split
+
+X_train,X_valid,y_train,y_valid=train_test_split(image_paths,steerings,test_size=0.2, random_state=6)
+
+now we are going to preprocess the images
+
+import matplotlib.image as mpimg
+ 
+use below line  and load the image
+
+now trees, hood of car is unnecessary..we will crop the height of the image as below
+
+for nvidia architecture..we use YUV and not RGB or grayscale where Y represents luminosity or brightness and UV adds color to the image
+
+apply Gausian blur to smoothen the image and reduce the noise
+
+for faster computation, resize the image
+
+normalise the image by dividing 255
+def img_preprocess(img):
+  img=mpimg.imread(img)
+  img=img[60:135,:,:]
+  return img
+
+
+plt.imshow(X_train[random.randint(0,len(X_train)-1)])
+plt.axis("off")
+print(X_train.shape)
+
+(1010, 66, 200, 3)
+ 1010 images of 66 height and 200 width and 3 depth
+
+eariler we dealth with 28X28 or 32X32...now we are going to handle 66X200X3 which is very complex
+
+
+instead of lenet architecture we are going by nvidia architecture
+
+
+behavioural cloning code simply has to return  appropriate steering angle which is regression based and not classification based
+
+Nvidia architecture is best for behavioural cloning
+
+
+train the model
+
+Relu function has its own shortcomings. in the negative region Relu always returns 0 value which can impact val_loss and no progress
+
+We apply Elu instead of Relu function which has non zero gradient value in negative region so it remains capable of contributing better output
+
+Flask & Socket.io to establish bi-directional client-server communication. Ultimately, this will be done to connect our model to the simulation.
+
+
+Data Augmentation is the process of creating new datasets by appluying transformatrion in current dataset which generates more data to improve
+
+we use imgaug library instead of keras image datagenerator which provides more variety
+
+1) zoom
+
+  zoom=iaa.Affine(scale=(1,1.3))
+
+2) penned
+
+  pen=iaa.Affine(translate_percent={"x":(-0.1,0.1), "y":(-0.1,0.1)})
+
+
+3) altering brightness
+
+multiplies all the pixel intensities inside the image by making darker
+
+  brightness=iaa.Multiply((0.2,1.2))
+
+4) Flipping
+
+flips horizontally or vertically or combination of both
+
+0 is vertical flip 1 is horizontal flip and -1 for both 
+
+we are going with 1
+
+we have to flip both image as well as steering angle as below
+
+image=cv2.flip(image,1)
+steering_angle=-steering_angle
+
+
+our augmentation techniques, we will apply 50% of our images
+
+
+Batch generator
+
+instead of loading all augmented images which is memory consuming..we will load images in batches and call the function when needed
+
+
+create a function batch generator and instead of using return function which is common , we are going to use yield
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
