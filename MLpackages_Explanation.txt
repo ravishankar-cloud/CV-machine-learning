@@ -21,7 +21,7 @@ cv2.drawChessboardCorners(img, (8,6), corners, ret) - Drawing detected corners o
 
 cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None) -Camera calibration, given object points, image points, and the shape of the grayscale image
 
-cv2.undistort(img, mtx, dist, None, mtx) -- where mtx is camera matrix  , dist is distortion coefficeint outputted from calibrate function
+cv2.undistort(img, mtx, dist, None, mtx) -- where img is distorted image and mtx is camera matrix  , dist is distortion coefficeint outputted from calibrate function
 
 cv2.bitwise_and(image,mask) - performs bitwise and operation
 
