@@ -15,6 +15,14 @@ cv2.Canny(blur,50,150) - Darkens the image
 cv2.fillPoly(mask,polygons,255) - apply the boundary 'polygons' against masked image and fill with white image 
 within the mask
 
+cv2.findChessboardCorners(image, (8,6), None) -Finding chessboard corners (for an 8x6 board)
+
+cv2.drawChessboardCorners(img, (8,6), corners, ret) - Drawing detected corners on an image where corners and ret are response on cv2.findChessboardCorners
+
+cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None) -Camera calibration, given object points, image points, and the shape of the grayscale image
+
+cv2.undistort(img, mtx, dist, None, mtx) -- where mtx is camera matrix  , dist is distortion coefficeint outputted from calibrate function
+
 cv2.bitwise_and(image,mask) - performs bitwise and operation
 
 cv2.HoughLinesP(cropped_canny, 2, np.pi/180, 100, np.array([]), minLineLength=40,maxLineGap=5) -  applies houghlines transformation
@@ -143,7 +151,6 @@ data.head() -displays top 5 rows
 data.drop(data.index[remove_list],inplace=True) - removes the list specified 
 
 data.iloc[i] -- pick the 'I'th row
-
 
 
 
