@@ -38,40 +38,6 @@ cv2.cvtColor(img,cv2.COLOR_BGR2GRAY) -- changes image color to grayscale
 
 cv2.equalizeHist(img) - Standardise the lighting in all of our images
 
-NUMPY ---
-
-lane_image=np.copy(image)-- Copies the image to lane_image
-
-np.zeros_like(image)-- creates a black image with 0 pixels
-
-np.ones(100) -- declares 100 1's'
-
-np.average(left_fit,axis=0) -- averages the value
-
-np.random.seed(0)--to get the same random numbers all the time
-
-np.random.normal(10,2,n_pts) -- generate random n_pts between  10 and 2 axis with normal distribution
-
-np.zeros(3) --Declares 3 zeroes
-
-np.matrix([np.zeros(3)]).T -- declares a matrix and transoposes it
-
-np.vstack((top_region, bottom_region)) - vertically stacks both the points
-np.meshgrid(x_span,y_span)--create 2D grid
-
-xx.ravel()-- use ravel to make it 1D
-
-np.c_[xx_,yy_] -- concatenate every row with corresponding columns
-
-np.asarray(img) -- change the image to array
-
-np.linspace(-3,3,500) -- distributes points across coordinates
-
-np.sin(X) - sin of X
-
-np.histogram(data['steering'],num_bins)
-
-
 MATPLOTIB:
 
 import matplotlib.image as mpimg
@@ -151,6 +117,99 @@ data.head() -displays top 5 rows
 data.drop(data.index[remove_list],inplace=True) - removes the list specified 
 
 data.iloc[i] -- pick the 'I'th row
+
+Numpy:
+
+lane_image=np.copy(image)-- Copies the image to lane_image
+
+np.zeros_like(image)-- creates a black image with 0 pixels
+
+np.ones(100) -- declares 100 1's'
+
+np.average(left_fit,axis=0) -- averages the value
+
+np.random.seed(0)--to get the same random numbers all the time
+
+np.random.normal(10,2,n_pts) -- generate random n_pts between  10 and 2 axis with normal distribution
+
+np.zeros(3) --Declares 3 zeroes
+
+np.matrix([np.zeros(3)]).T -- declares a matrix and transoposes it
+
+np.vstack((top_region, bottom_region)) - vertically stacks both the points
+np.meshgrid(x_span,y_span)--create 2D grid
+
+xx.ravel()-- use ravel to make it 1D
+
+np.c_[xx_,yy_] -- concatenate every row with corresponding columns
+
+np.asarray(img) -- change the image to array
+
+np.linspace(-3,3,500) -- distributes points across coordinates
+
+np.sin(X) - sin of X
+
+np.histogram(data['steering'],num_bins)
+
+np.matmul(A,B) , np.dot(A,B) and np.inner(A,b)
+
+multiplies every row with column and adds up
+
+np.linalg.matrix_power(a,3)
+
+a to the power of 3
+
+np.kron(A,B)
+
+A is multiplied point by point with B and  output like 3x3 and 3x3 oututs 9x9
+
+
+np.linalg.cholesky(A)
+
+Cholesky Decomposition - transpose conjucation multiplied by itself
+
+np.linalg.qr(A)
+QR Decomposition
+
+Q is orthogonal matrix and R is Rectangle
+
+np.linalg.eig(A)
+outputs Eigen value Decomposition(EVD)
+
+np.linalg.eigvals(A)
+outputs just value of eigens
+
+np.diag(d)
+outputs Diagonal matrix
+
+np.linalg.inv(P)
+
+inverse matrix of P
+
+np.real(P)
+retrieves only real part and ignores imaginary part
+
+np.linalg.svd(A)
+
+retrieves single value decomposition (A=USVt)
+
+np.linalg.norm(A)
+
+function that takes matrices as input and retrieves a single number
+
+np.linalg.cond(A)
+
+represents singularity
+
+np.linalg.det(B)
+represents determinant
+
+np.linalg.matrix_rank(B)
+determines the rank of matrix
+
+np.trace(A)
+
+sums up the diagonal elements
 
 
 
