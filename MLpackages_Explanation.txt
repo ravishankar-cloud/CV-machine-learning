@@ -108,6 +108,9 @@ X_train,X_valid,y_train,y_valid=train_test_split(image_paths,steerings,test_size
 X,y=datasets.make_circles(n_samples=n_pts,random_state=123,noise=0.1,factor=0.2) -makes a circle
 X,y=datasets.make_blobs(n_samples=n_pts,random_state=123,centers=centers,cluster_std=0.4)--makes a blob
 
+Image and Image stat from PILLOW:
+
+img.transpose(Image.FLIP_LEFT_RIGHT) - flips the image horizontally
 PANDAS:
 
 data=pd.read_csv('german-traffic-signs/signnames.csv')- reads the csv file
