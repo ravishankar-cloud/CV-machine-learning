@@ -115,6 +115,8 @@ img.transpose(Image.FLIP_LEFT_RIGHT) - flips the image horizontally
 img.resize(size) - resizes the image
 
 img.crop((x1, y1, x2 ,y2)) - crops the image
+
+Image.open(filename) - opens the image
 PANDAS:
 
 data=pd.read_csv('german-traffic-signs/signnames.csv')- reads the csv file
