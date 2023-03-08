@@ -40,7 +40,10 @@ cv2.equalizeHist(img) - Standardise the lighting in all of our images
 
 MATPLOTIB:
 
+import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+from matplotlib.patches import Rectangle
+
 original_image=mpimg.imread(image) - Reads the image
 
 _,ax=plt.subplots(figsize=(4,4))  -- use plt.subplots to plot multiple plots on same figure
@@ -69,7 +72,14 @@ tf.math.log(masked_logits) - calculates loogs of masked output
 tf.Variable(x) -`tf.Variable` allow us to calculate gradients
 tf.GradientTape() - calculate the gradient of a function
 tf.argmax- to find the index of highest probability
-tf.cast -cast tensor from one type to another
+tf.cast(aug_img/255.0, tf.float32) -cast tensor from one type to another
+from tensorflow.keras.preprocessing import image_dataset_from_directory
+dataset = image_dataset_from_directory(args.imdir, 
+                                           image_size=(32, 32),
+                                           validation_split=0.1,
+                                           subset='training',
+                                           seed=123,
+                                           batch_size=1)
 
 Keras:
 
