@@ -127,6 +127,8 @@ img.resize(size) - resizes the image
 
 img.crop((x1, y1, x2 ,y2)) - crops the image
 
+Image.open('data/00012_00027.jpg').convert('RGB') 
+
 Image.open(filename) - opens the image
 PANDAS:
 
@@ -138,7 +140,14 @@ data.drop(data.index[remove_list],inplace=True) - removes the list specified
 
 data.iloc[i] -- pick the 'I'th row
 
+
+Aalbumentations
+import albumentations as A
+A.Rotate(limit=90, always_apply=True) - rotate 
 Numpy:
+
+np.pad(input_array, paddings, mode='constant', constant_values=0) - padd the input layer
+
 
 lane_image=np.copy(image)-- Copies the image to lane_image
 
