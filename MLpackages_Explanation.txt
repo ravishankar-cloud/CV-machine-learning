@@ -125,9 +125,15 @@ SKLEARN:
 from sklearn import datasets
 
 from sklearn.model_selection import train_test_split
-X_train,X_valid,y_train,y_valid=train_test_split(image_paths,steerings,test_size=0.2, random_state=6)
+from sklearn.preprocessing import RobustScaler, StandardScaler, QuantileTransformer
+
+X_train,X_valid,y_train,y_valid=train_test_split(image_paths,steerings,test_size=0.2, random_state=6) - defines test and training set
 X,y=datasets.make_circles(n_samples=n_pts,random_state=123,noise=0.1,factor=0.2) -makes a circle
 X,y=datasets.make_blobs(n_samples=n_pts,random_state=123,centers=centers,cluster_std=0.4)--makes a blob
+
+Waymo dataset: 
+from tools.waymo_reader.simple_waymo_open_dataset_reader import dataset_pb2
+
 
 Image and Image stat from PILLOW:
 
@@ -150,6 +156,8 @@ data.drop(data.index[remove_list],inplace=True) - removes the list specified
 
 data.iloc[i] -- pick the 'I'th row
 
+open3D:
+import open3d as o3d 
 
 Aalbumentations
 import albumentations as A
