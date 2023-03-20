@@ -132,7 +132,9 @@ X,y=datasets.make_circles(n_samples=n_pts,random_state=123,noise=0.1,factor=0.2)
 X,y=datasets.make_blobs(n_samples=n_pts,random_state=123,centers=centers,cluster_std=0.4)--makes a blob
 
 Waymo dataset: 
-from tools.waymo_reader.simple_waymo_open_dataset_reader import dataset_pb2
+from tools.waymo_reader.simple_waymo_open_dataset_reader import WaymoDataFileReader, dataset_pb2, label_pb2
+WaymoDataFileReader(data_fullpath) - Loads the data in data_fullpath
+dataset_pb2.LaserName.TOP
 
 
 Image and Image stat from PILLOW:
