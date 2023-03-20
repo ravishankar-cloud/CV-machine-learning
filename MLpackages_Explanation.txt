@@ -134,8 +134,12 @@ X,y=datasets.make_blobs(n_samples=n_pts,random_state=123,centers=centers,cluster
 Waymo dataset: 
 from tools.waymo_reader.simple_waymo_open_dataset_reader import WaymoDataFileReader, dataset_pb2, label_pb2
 WaymoDataFileReader(data_fullpath) - Loads the data in data_fullpath
-dataset_pb2.LaserName.TOP
 
+camera_name = dataset_pb2.CameraName.FRONT --Access the data from camera sensor
+image = [obj for obj in frame.images if obj.name == camera_name][0]
+
+lidar_name = dataset_pb2.LaserName.TOP --Access the data from Lidar
+lidar = [obj for obj in frame.lasers if obj.name == lidar_name][0]
 
 Image and Image stat from PILLOW:
 
