@@ -141,6 +141,13 @@ image = [obj for obj in frame.images if obj.name == camera_name][0]
 lidar_name = dataset_pb2.LaserName.TOP --Access the data from Lidar
 lidar = [obj for obj in frame.lasers if obj.name == lidar_name][0]
 
+lidar_calib = [obj for obj in frame.context.laser_calibrations if obj.name == lidar_name][0] -- gets laser calibration
+
+min_pitch = lidar_calib.beam_inclination_min
+max_pitch = lidar_calib.beam_inclination_max
+vfov = max_pitch - min_pitch  --- The above 3 lines computes vertical field-of-view from lidar calibration by subtracting min and max inclination
+
+
 Image and Image stat from PILLOW:
 
 img.transpose(Image.FLIP_LEFT_RIGHT) - flips the image horizontally
