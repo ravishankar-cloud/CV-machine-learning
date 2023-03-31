@@ -63,6 +63,8 @@ plt.legend(['accuracy']) --creates a legend
 plt.contourf(xx,yy,z) -- contour plot to produce separated label
 plt.show() -show the plot
 
+import open3d as o3d--To work with 3D data (such as lidar) that can be used in either Python or C++.
+
 Tensorflow:
 
 tf.convert_to_tensor(arr) - Tensors are a type of array used by Tensorflow. They have a lot in common with numpy arrays.
