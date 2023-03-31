@@ -223,6 +223,7 @@ np.matmul(A,B) , np.dot(A,B) and np.inner(A,b)
 multiplies every row with column and adds up
 
 np.linalg.matrix_power(a,3)
+np.int_ - converts into 8 bit integer value
 
 a to the power of 3
 
