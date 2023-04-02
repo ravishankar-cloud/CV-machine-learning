@@ -174,6 +174,14 @@ data.iloc[i] -- pick the 'I'th row
 open3D:
 import open3d as o3d 
 
+vis_lpc = o3d.visualization.VisualizerWithKeyCallback() --initialize open3d with key callback
+vis_lpc.create_window(window_name='Open3D', width=1200, height=1080, left=50, top=50, visible=True) -- and create window
+ pointcloud = o3d.geometry.PointCloud() --create instance of open3d point-cloud class
+ pointcloud.points = o3d.utility.Vector3dVector(pcl[:,:3]) --set points in pointcloud instance by converting the point-cloud into 3d vectors (using open3d function Vector3dVector)
+visualising.add_geometry(pointcloud) -- adds the pointcloud instance to visualization using add_geometry;
+visualising.register_key_callback(262,right_click) - Dont close the window till right click is pressed
+
+
 Aalbumentations
 import albumentations as A
 A.Rotate(limit=90, always_apply=True) - rotate the object 90
