@@ -191,6 +191,8 @@ augmentations = A.Compose([A.Rotate(limit=90, p=1.0),
                            A.CoarseDropout(p=1.0)]) -  use Compose to combine multiple augmentations.
 Numpy:
 
+np.lexsort((-lidar_pcl_cpy[:, 2], lidar_pcl_cpy[:, 1], lidar_pcl_cpy[:, 0])) -re-arrange elements in lidar_pcl_cpy by sorting first by x, then y, then -z
+np.unique(lidar_pcl_cpy[:, 0:2], axis=0, return_index=True, return_counts=True) - extract all points with identical x and y such that only the top-most z-coordinate is kept 
 np.pad(input_array, paddings, mode='constant', constant_values=0) - padd the input layer
 np.where(lidar_pcl[:, 0] >= lim_x[0])  - retrieve the points whose coordinates are within these limits
 
