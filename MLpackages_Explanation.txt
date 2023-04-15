@@ -301,7 +301,8 @@ np.arctan(pos_sens[1]/pos_sens[0]) -- it is inverse tangent function, or arcus t
 
 np.inf -infinity
 
-np.argmin(A, axis=None)--To get the indices of the minimum entry in the association matrix A,
+np.argmin(A, axis=None)--To get the indices of the minimum entry in the association matrix A
+np.nan -not a number
 
 
 
