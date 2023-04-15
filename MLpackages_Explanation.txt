@@ -123,6 +123,12 @@ datagen=ImageDataGenerator(width_shift_range=0.1,
 
 datagen.fit(X_train) - fits our data to imagedatagenerator model
 
+SCIPY: 
+
+from scipy.stats.distributions import chi2
+
+chi2.ppf(p, df)--ppf stands for percent point function, which is the inverse of the cumulative density function
+
 SKLEARN:
 from sklearn import datasets
 
@@ -294,6 +300,8 @@ np.pi/4 -to denote angle 45 degree
 np.arctan(pos_sens[1]/pos_sens[0]) -- it is inverse tangent function, or arcus tangens used to calc angle between object and x-axis
 
 np.inf -infinity
+
+np.argmin(A, axis=None)--To get the indices of the minimum entry in the association matrix A,
 
 
 
