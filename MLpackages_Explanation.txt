@@ -293,6 +293,8 @@ np.pi/4 -to denote angle 45 degree
 
 np.arctan(pos_sens[1]/pos_sens[0]) -- it is inverse tangent function, or arcus tangens used to calc angle between object and x-axis
 
+np.inf -infinity
+
 
 
 
