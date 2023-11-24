@@ -74,7 +74,7 @@ param.assign_sub(lr * grad / bs)--subtract gradient scaled by learning rate
 tf.boolean_mask(scaled_logits, one_hot) -- mask the logits
 tf.math.log(masked_logits) - calculates loogs of masked output
 tf.Variable(x) -`tf.Variable` allow us to calculate gradients
-tf.GradientTape() - calculate the gradient of a function
+tf.GradientTape() - calculate the gradient of a function.GradientTape is a mathematical tool for automatic differentiation (autodiff).
 tf.argmax- to find the index of highest probability
 tf.cast(aug_img/255.0, tf.float32) -cast tensor from one type to another
 from tensorflow.keras.preprocessing import image_dataset_from_directory
