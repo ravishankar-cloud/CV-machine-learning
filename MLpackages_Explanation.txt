@@ -69,6 +69,7 @@ Tensorflow:
 
 tf.convert_to_tensor(arr) - Tensors are a type of array used by Tensorflow. They have a lot in common with numpy arrays.
 tf.exp(logits) -- exponentials of logits
+tf.math.reduce_sum(exp, 1, keepdims=True) --along with above line provides output of softmax
 tf.boolean_mask(scaled_logits, one_hot) -- mask the logits
 tf.math.log(masked_logits) - calculates loogs of masked output
 tf.Variable(x) -`tf.Variable` allow us to calculate gradients
